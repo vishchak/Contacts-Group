@@ -27,14 +27,15 @@
                         <button type="button" id="delete_contact" class="btn btn-default navbar-btn">Delete Contact
                         </button>
                     </li>
-<%--                    added delete button                 --%>
+                    <%--                    added delete button                 --%>
                     <li class="dropdown">
-                        <button type="button" id="delete_group" class="btn btn-default navbar-btn" data-toggle="dropdown">Delete Group</button>
+                        <button type="button" id="delete_group" class="btn btn-default navbar-btn"
+                                data-toggle="dropdown">Delete Group
+                        </button>
                         <ul class="dropdown-menu">
                             <li><a href="/group/${group.id}">${group.name}</a></li>
                             <c:forEach items="${groups}" var="group">
                                 <li><a href="/delete_group?groupId=${group.id}">${group.name}</a></li>
-
                             </c:forEach>
                         </ul>
                     </li>
@@ -56,6 +57,12 @@
                     </div>
                     <button type="submit" class="btn btn-default">Submit</button>
                 </form>
+                <%--                added dowload button--%>
+                <li>
+                    <button type="button" id="download_contacts" class="btn btn-default navbar-btn">Download Contacts
+                    </button>
+                </li>
+
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
     </nav>
@@ -108,6 +115,9 @@
 
     $('#add_group').click(function () {
         window.location.href = '/group_add_page';
+    });
+    $('#download_contacts').click(function () {
+        window.location.href = '/download';
     });
 
     $('#delete_contact').click(function () {

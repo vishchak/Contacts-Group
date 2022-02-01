@@ -1,16 +1,24 @@
 package ua.kiev.prog.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import ua.kiev.prog.model.Contact;
 import ua.kiev.prog.model.Group;
 import ua.kiev.prog.services.ContactService;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.*;
+import java.net.URLConnection;
 
 import static ua.kiev.prog.controllers.GroupController.DEFAULT_GROUP_ID;
 
@@ -77,10 +85,31 @@ public class ContactController {
                              @RequestParam String email) {
         Group group = (groupId != DEFAULT_GROUP_ID) ?
                 contactService.findGroup(groupId) : null;
-
         Contact contact = new Contact(group, name, surname, phone, email);
         contactService.addContact(contact);
 
+        return "redirect:/";
+    }
+
+    @GetMapping(value = "/download")
+    public String download(HttpServletResponse response) {
+        File file = contactService.contactsJson();
+        try {
+            InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
+            String mimeType = URLConnection.guessContentTypeFromStream(inputStream);
+
+            if (mimeType == null) {
+                mimeType = "application/octet-stream";
+            }
+            response.setContentType(mimeType);
+            response.setContentLength((int) file.length());
+            response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", file.getName()));
+
+            FileCopyUtils.copy(inputStream, response.getOutputStream());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return "redirect:/";
     }
 }

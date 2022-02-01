@@ -57,6 +57,12 @@ public class ContactDAOImpl implements ContactDAO {
     }
 
     @Override
+    public List<Contact> list() {
+      TypedQuery<Contact>query = entityManager.createQuery("SELECT c FROM Contact c", Contact.class);
+        return query.getResultList();
+    }
+
+    @Override
     public long count() {
         TypedQuery<Long> query = entityManager.createQuery("SELECT COUNT(c) FROM Contact c", Long.class);
         return query.getSingleResult();

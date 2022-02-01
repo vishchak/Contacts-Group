@@ -1,13 +1,21 @@
 package ua.kiev.prog.services;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ua.kiev.prog.dao.ContactDAOImpl;
 import ua.kiev.prog.model.Contact;
 import ua.kiev.prog.model.Group;
 import ua.kiev.prog.dao.ContactDAO;
 import ua.kiev.prog.dao.GroupDAO;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 //component-like annotation
@@ -59,6 +67,11 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Transactional(readOnly = true)
+    public List<Contact> listContacts() {
+        return contactDAO.list();
+    }
+
+    @Transactional(readOnly = true)
     public long count() {
         return contactDAO.count();
     }
@@ -77,5 +90,22 @@ public class ContactServiceImpl implements ContactService {
     @Transactional
     public void deleteGroup(Group group) {
         groupDAO.delete(group);
+    }
+
+    //smth with groups
+    public File contactsJson() {
+        List<Contact> contacts = listContacts();
+        Gson gson = new GsonBuilder().create();
+        try (FileWriter fw = new FileWriter("C:\\Users\\denis\\Downloads\\contacts.json")) {
+            for (Contact contact : contacts) {
+                if (contact != null) {
+                    fw.append(contact.toString() + contact.getGroup());
+                } else
+                    gson.toJson(contact, fw);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new File("C:\\Users\\denis\\Downloads\\contacts.json");
     }
 }
